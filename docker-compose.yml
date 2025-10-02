@@ -56,4 +56,7 @@ services:
       # uncomment the following line if you need to work on the backend code
       # - "./backend:/backend"
     environment:
-      - AYON_STORAGE_PATH=/storage
+      - "AYON_STACK_SERVER_TAG=latest"
+      - "AYON_STACK_SERVER_PORT=5000"
+      - "AYON_STORAGE_PATH=/storage"
+      - "AYON_MOTD=Welcome to Voia"
