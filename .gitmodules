@@ -1,5 +1,5 @@
 [submodule "backend"]
-	branch = main
+	branch = voia
 	path = backend
 	url = https://github.com/teamvoia/ayon-backend.git
 [submodule "frontend"]
