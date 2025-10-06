@@ -2,3 +2,7 @@
 	branch = main
 	path = backend
 	url = https://github.com/teamvoia/ayon-backend.git
+[submodule "frontend"]
+	path = frontend
+	url = https://github.com/teamvoia/ayon-frontend.git
+	branch = voia
