@@ -1,0 +1,60 @@
+name: Update Submodules
+
+on:
+  # Trigger when backend or frontend repos are updated
+  repository_dispatch:
+    types: [submodule-updated]
+  
+  # Also allow manual trigger
+  workflow_dispatch:
+  
+  # Run daily to catch any missed updates
+  schedule:
+    - cron: '0 16 * * 1-5'
+
+jobs:
+  update-submodules:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout docker repo
+        uses: actions/checkout@v4
+        with:
+          ref: voia
+          token: ${{ secrets.PAT_TOKEN }} # Need PAT for submodules
+          submodules: true
+          fetch-depth: 0
+      
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Update submodules to latest voia
+        run: |
+          git submodule update --remote --merge
+      
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Commit and push if changed
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git add backend frontend
+          git commit -m "actions: update submodules to latest voia [skip ci]"
+          git push origin voia
+      
+      - name: Create summary
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          echo "### Submodules Updated ✅" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The following submodules were updated:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          git diff HEAD~1 --submodule=log >> $GITHUB_STEP_SUMMARY
