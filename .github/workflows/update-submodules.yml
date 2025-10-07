@@ -1,14 +1,9 @@
 name: Update Submodules
 
 on:
-  # Trigger when backend or frontend repos are updated
   repository_dispatch:
     types: [submodule-updated]
-  
-  # Also allow manual trigger
   workflow_dispatch:
-  
-  # Run Mon-Fri at 4 PM UTC (9 AM PST) to catch any missed updates
   schedule:
     - cron: '0 16 * * 1-5'
 
@@ -21,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: voia
-          token: ${{ secrets.PAT_TOKEN }} # Need PAT for submodules
+          token: ${{ secrets.PAT_TOKEN }}
           submodules: true
           fetch-depth: 0
       
@@ -86,3 +81,8 @@ jobs:
             echo "_No changes_" >> $GITHUB_STEP_SUMMARY
           fi
           cd ..
+      
+      - name: No changes summary
+        if: steps.check_changes.outputs.has_changes == 'false'
+        run: |
+          echo "### ℹ️ Submodules already up to date" >> $GITHUB_STEP_SUMMARY
