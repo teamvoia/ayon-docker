@@ -53,8 +53,9 @@ services:
       - "/mnt/data/ayon/data:/data"
       - "/mnt/data/Voia Dropbox/Ayon Server:/storage"
 
-      # uncomment the following line if you need to work on the backend code
+      # Mount local backend and frontend (overrides dirs in image)
       - "./backend:/backend"
+      - "./frontend/dist:/frontend"  # built frontend assets (npm run build)
 
     environment:
       - "AYON_STACK_SERVER_TAG=latest"

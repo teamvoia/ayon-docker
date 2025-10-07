@@ -1,6 +1,7 @@
 addons/*
 #backend/
 #frontend/
+frontend/dist/
 storage/
 RELEASE
 
