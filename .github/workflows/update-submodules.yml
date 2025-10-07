@@ -71,7 +71,7 @@ jobs:
         if: steps.check_changes.outputs.has_changes == 'true'
         run: |
           git add backend frontend
-          git commit -m "chore: update submodules to latest voia [skip ci]"
+          git commit -m "automated: update submodules to latest on voia branches"
           git push origin voia
       
       - name: Create summary
