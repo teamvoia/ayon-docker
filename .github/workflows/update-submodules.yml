@@ -8,7 +8,7 @@ on:
   # Also allow manual trigger
   workflow_dispatch:
   
-  # Run daily to catch any missed updates
+  # Run Mon-Fri at 4 PM UTC (9 AM PST) to catch any missed updates
   schedule:
     - cron: '0 16 * * 1-5'
 
@@ -47,7 +47,7 @@ jobs:
         if: steps.check_changes.outputs.has_changes == 'true'
         run: |
           git add backend frontend
-          git commit -m "actions: update submodules to latest voia [skip ci]"
+          git commit -m "automated: update submodules to latest on voia branches"
           git push origin voia
       
       - name: Create summary
@@ -55,6 +55,34 @@ jobs:
         run: |
           echo "### Submodules Updated ✅" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "The following submodules were updated:" >> $GITHUB_STEP_SUMMARY
+          
+          # Backend changes
+          echo "#### 🔧 Backend" >> $GITHUB_STEP_SUMMARY
+          cd backend
+          OLD_COMMIT=$(git rev-parse HEAD~1 2>/dev/null || git rev-parse HEAD)
+          NEW_COMMIT=$(git rev-parse HEAD)
+          
+          if [ "$OLD_COMMIT" != "$NEW_COMMIT" ]; then
+            echo "**Commits:** [\`${OLD_COMMIT:0:7}\`](https://github.com/teamvoia/ayon-backend/commit/$OLD_COMMIT) → [\`${NEW_COMMIT:0:7}\`](https://github.com/teamvoia/ayon-backend/commit/$NEW_COMMIT)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            git log --pretty=format:"- %s (%an)" $OLD_COMMIT..$NEW_COMMIT >> $GITHUB_STEP_SUMMARY
+          else
+            echo "_No changes_" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "" >> $GITHUB_STEP_SUMMARY
-          git diff HEAD~1 --submodule=log >> $GITHUB_STEP_SUMMARY
+          cd ..
+          
+          # Frontend changes
+          echo "#### 🎨 Frontend" >> $GITHUB_STEP_SUMMARY
+          cd frontend
+          OLD_COMMIT=$(git rev-parse HEAD~1 2>/dev/null || git rev-parse HEAD)
+          NEW_COMMIT=$(git rev-parse HEAD)
+          
+          if [ "$OLD_COMMIT" != "$NEW_COMMIT" ]; then
+            echo "**Commits:** [\`${OLD_COMMIT:0:7}\`](https://github.com/teamvoia/ayon-frontend/commit/$OLD_COMMIT) → [\`${NEW_COMMIT:0:7}\`](https://github.com/teamvoia/ayon-frontend/commit/$NEW_COMMIT)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            git log --pretty=format:"- %s (%an)" $OLD_COMMIT..$NEW_COMMIT >> $GITHUB_STEP_SUMMARY
+          else
+            echo "_No changes_" >> $GITHUB_STEP_SUMMARY
+          fi
+          cd ..
