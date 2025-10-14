@@ -15,4 +15,4 @@ docker exec ayon-docker-postgres-1 pg_dump -U ayon ayon > "$BACKUP_FILE"
 # Keep only last 7 days of backups (optional)
 find "$BACKUP_DIR" -name "db_*.sql" -mtime +7 -delete
 
-echo "$(date): Database backed up to $BACKUP_FILE" >> /mnt/data/Voia Dropbox/Ayon Server/backup.log
+echo "$(date): Database backed up to $BACKUP_FILE" >> "/mnt/data/Voia Dropbox/Ayon Server/backup.log"
